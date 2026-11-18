@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://climatizacionquillota.cl/sitemap.xml
