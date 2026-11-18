@@ -190,12 +190,10 @@ select {
 }
 
 .brand__logo {
-  color: var(--color-petrol);
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-}
-
-.brand__logo-bg {
-  fill: var(--color-petrol);
+  border-radius: 10px;
 }
 
 .brand__text {

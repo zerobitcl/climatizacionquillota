@@ -1,0 +1,8 @@
+# Canonical: https://climatizacionquillota.cl/ (sin www)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # www → apex
+  RewriteCond %{HTTP_HOST} ^www\.climatizacionquillota\.cl$ [NC]
+  RewriteRule ^(.*)$ https://climatizacionquillota.cl/$1 [R=301,L]
+</IfModule>

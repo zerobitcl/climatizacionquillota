@@ -7,8 +7,9 @@ const SITE_CONFIG = {
   email: "eduardorojas@outlook.cl",
   domain: "https://climatizacionquillota.cl/",
   city: "Quillota",
+  ga4Id: "G-PXK32E6H8E",
   topbar:
-    "Técnicos de climatización en Quillota • Cotiza por formulario y te respondemos por correo",
+    "Técnicos de climatización en Quillota • Cotiza por formulario y te contactamos por teléfono",
   businessHours: "Lunes a sábado 08:30–19:00",
   /** FormSubmit entrega el lead al correo sin backend propio */
   formEndpoint: "https://formsubmit.co/ajax/eduardorojas@outlook.cl",
@@ -45,8 +46,58 @@ function formatBTU(value) {
   return value.toLocaleString("es-CL");
 }
 
-function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+/** Acepta +56 9..., 569..., 9... y formatos con espacios/guiones (CL móvil/fijo). */
+function isValidPhone(value) {
+  const digits = String(value).replace(/\D/g, "");
+  if (/^569\d{8}$/.test(digits)) return true;
+  if (/^56[2-9]\d{7,8}$/.test(digits)) return true;
+  if (/^9\d{8}$/.test(digits)) return true;
+  if (/^[2-9]\d{7,8}$/.test(digits)) return true;
+  return false;
+}
+
+function normalizePhone(value) {
+  const digits = String(value).replace(/\D/g, "");
+  if (/^9\d{8}$/.test(digits)) return `+56 ${digits.slice(0, 1)} ${digits.slice(1, 5)} ${digits.slice(5)}`;
+  if (/^569\d{8}$/.test(digits)) {
+    return `+56 ${digits.slice(2, 3)} ${digits.slice(3, 7)} ${digits.slice(7)}`;
+  }
+  if (/^56[2-9]\d{7,8}$/.test(digits)) {
+    const local = digits.slice(2);
+    return `+56 ${local.slice(0, 1)} ${local.slice(1)}`;
+  }
+  return value.trim();
+}
+
+window.dataLayer = window.dataLayer || [];
+window.gtag =
+  window.gtag ||
+  function gtag() {
+    window.dataLayer.push(arguments);
+  };
+
+/** GA4 diferido: no compite con LCP/CSS; cola dataLayer hasta que cargue el script. */
+function initGA4() {
+  const id = SITE_CONFIG.ga4Id;
+  if (!id || document.getElementById("ga4-gtag")) return;
+
+  window.gtag("js", new Date());
+  window.gtag("config", id);
+
+  const script = document.createElement("script");
+  script.id = "ga4-gtag";
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+  document.head.appendChild(script);
+}
+
+function scheduleGA4() {
+  const run = () => initGA4();
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(run, { timeout: 2500 });
+  } else {
+    setTimeout(run, 1200);
+  }
 }
 
 function trackEvent(name, detail = {}) {
@@ -57,12 +108,8 @@ function trackEvent(name, detail = {}) {
     ...detail,
   };
 
-  window.dataLayer = window.dataLayer || [];
   window.dataLayer.push(payload);
-
-  if (typeof window.gtag === "function") {
-    window.gtag("event", name, detail);
-  }
+  window.gtag("event", name, detail);
 
   if (typeof console !== "undefined" && console.debug) {
     console.debug("[track]", payload);
@@ -303,7 +350,6 @@ function initBTUCalculator() {
 
       if (snap && quoteForm) {
         quoteForm.servicio.value = "Instalación";
-        if (snap.m2) quoteForm.metros.value = String(Math.round(snap.m2));
 
         const btuInput = document.getElementById("quote-btu");
         const detalleInput = document.getElementById("quote-detalle");
@@ -336,7 +382,7 @@ function setQuoteStatus(type, message) {
   status.className = `quote-form__status${type ? ` is-${type}` : ""}`;
 }
 
-/* ——— Formulario hero → correo (FormSubmit) ——— */
+/* ——— Formulario hero → lead por teléfono (FormSubmit) ——— */
 function initQuoteForm() {
   const form = document.getElementById("quote-form");
   const submitBtn = document.getElementById("quote-submit");
@@ -346,15 +392,15 @@ function initQuoteForm() {
     e.preventDefault();
 
     const nombre = form.nombre.value.trim();
-    const email = form.email.value.trim();
+    const telefonoRaw = form.telefono.value.trim();
+    const telefono = normalizePhone(telefonoRaw);
     const sector = form.sector.value.trim();
     const servicio = form.servicio.value;
-    const metros = form.metros.value.trim();
     const mensaje = form.mensaje?.value.trim() || "";
     const honeypot = form._gotcha?.value || "";
 
     if (honeypot) {
-      setQuoteStatus("success", "Solicitud enviada. Te contactaremos por correo.");
+      setQuoteStatus("success", "Solicitud enviada. Te contactaremos por teléfono.");
       form.reset();
       return;
     }
@@ -362,7 +408,7 @@ function initQuoteForm() {
     let valid = true;
     const checks = [
       [form.nombre, Boolean(nombre)],
-      [form.email, isValidEmail(email)],
+      [form.telefono, isValidPhone(telefonoRaw)],
       [form.sector, Boolean(sector)],
       [form.servicio, Boolean(servicio)],
     ];
@@ -389,10 +435,9 @@ function initQuoteForm() {
 
     const payload = {
       nombre,
-      email,
+      telefono,
       sector,
       servicio,
-      metros: metros ? `${metros} m²` : "No indicado",
       mensaje: mensaje || "Sin mensaje adicional",
       btu_recomendados: btuValue,
       detalle_calculo: detalleValue,
@@ -400,7 +445,6 @@ function initQuoteForm() {
       origen: SITE_CONFIG.domain,
       _subject: `Nueva cotización ${SITE_CONFIG.brandName} — ${servicio} — ${sector}`,
       _template: "table",
-      _replyto: email,
       _captcha: "false",
     };
 
@@ -427,8 +471,7 @@ function initQuoteForm() {
       trackEvent("quote_form_submit", {
         servicio,
         sector,
-        metros: metros || null,
-        channel: "email",
+        channel: "phone",
       });
 
       form.reset();
@@ -439,7 +482,7 @@ function initQuoteForm() {
 
       setQuoteStatus(
         "success",
-        "Listo. Recibimos tu solicitud y te responderemos por correo a la brevedad."
+        "Listo. Recibimos tu solicitud y te contactaremos por teléfono a la brevedad."
       );
     } catch (err) {
       trackEvent("quote_form_error", { message: String(err) });
@@ -450,7 +493,7 @@ function initQuoteForm() {
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Enviar cotización por correo";
+        submitBtn.textContent = "Solicitar cotización";
       }
     }
   });
@@ -473,4 +516,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initQuoteForm();
   initCTATracking();
   trackEvent("page_view", { path: window.location.pathname });
+
+  if (document.readyState === "complete") {
+    scheduleGA4();
+  } else {
+    window.addEventListener("load", scheduleGA4, { once: true });
+  }
 });
