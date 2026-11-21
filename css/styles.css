@@ -190,10 +190,12 @@ select {
 }
 
 .brand__logo {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
 }
 
 .brand__text {
@@ -440,11 +442,11 @@ select {
 }
 
 .hero__form-wrap {
-  animation: riseIn 0.7s var(--ease) both;
+  animation: riseIn 0.7s var(--ease);
 }
 
 .hero__copy {
-  animation: riseIn 0.55s var(--ease) both;
+  animation: riseIn 0.55s var(--ease);
 }
 
 .quote-form {
@@ -574,7 +576,7 @@ select {
 }
 
 .section__header--light p {
-  color: #94A3B8;
+  color: #CBD5E1;
 }
 
 /* —— Calculadora —— */
@@ -664,7 +666,7 @@ select {
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #94A3B8;
+  color: #CBD5E1;
 }
 
 .calc__btu {
@@ -687,7 +689,7 @@ select {
 .calc__meta {
   margin: 0 0 1rem;
   font-size: 0.9rem;
-  color: #94A3B8;
+  color: #CBD5E1;
 }
 
 .calc__advice {
@@ -770,7 +772,7 @@ select {
 
 .why-list p {
   margin: 0;
-  color: #94A3B8;
+  color: #CBD5E1;
   max-width: 40ch;
 }
 
@@ -915,7 +917,7 @@ select {
 /* —— Footer —— */
 .footer {
   background: var(--color-petrol-deep);
-  color: #94A3B8;
+  color: #CBD5E1;
   padding-top: 3rem;
 }
 
@@ -1003,11 +1005,9 @@ select {
 /* —— Animations —— */
 @keyframes riseIn {
   from {
-    opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(12px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -1142,5 +1142,257 @@ select {
 
   .hero__trust {
     gap: 0.85rem;
+  }
+}
+
+/* —— Proof / E-E-A-T photo —— */
+.proof-photo {
+  margin: 0;
+}
+
+.proof-photo img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.proof-photo figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+/* —— Breadcrumbs —— */
+.breadcrumb {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.75rem 0;
+  font-size: 0.875rem;
+}
+
+.breadcrumb ol {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  color: var(--color-muted);
+}
+
+.breadcrumb li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.breadcrumb li:not(:last-child)::after {
+  content: "/";
+  color: #94A3B8;
+}
+
+.breadcrumb a {
+  color: var(--color-cyan);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb [aria-current="page"] {
+  color: var(--color-petrol);
+  font-weight: 650;
+}
+
+/* —— Page hero (inner pages) —— */
+.page-hero {
+  background:
+    linear-gradient(120deg, var(--color-petrol-deep) 0%, var(--color-petrol) 55%, #0C4A6E 100%);
+  color: #F8FAFC;
+  padding: 2.5rem 0 2.75rem;
+}
+
+.page-hero h1 {
+  color: #fff;
+  max-width: 22ch;
+  margin-bottom: 0.85rem;
+}
+
+.page-hero__lead {
+  color: #CBD5E1;
+  max-width: 52ch;
+  margin: 0 0 1.25rem;
+  font-size: 1.0625rem;
+}
+
+.page-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* —— Content layout —— */
+.content-grid {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+}
+
+.content-prose h2 {
+  margin-top: 0;
+}
+
+.content-prose h3 {
+  margin-top: 1.5rem;
+}
+
+.content-prose ul,
+.content-prose ol {
+  margin: 0 0 1rem 1.15rem;
+  color: var(--color-muted);
+}
+
+.content-prose li + li {
+  margin-top: 0.35rem;
+}
+
+.content-prose p {
+  color: var(--color-muted);
+}
+
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.95rem;
+}
+
+.price-table th,
+.price-table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.price-table th {
+  background: var(--color-cyan-soft);
+  color: var(--color-petrol);
+  font-weight: 700;
+}
+
+.price-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.price-table td:last-child {
+  font-weight: 700;
+  color: var(--color-petrol);
+  white-space: nowrap;
+}
+
+.brand-chips,
+.btu-chips,
+.link-cards {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+}
+
+.brand-chips li,
+.btu-chips li {
+  padding: 0.45rem 0.85rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--color-petrol);
+}
+
+.link-cards {
+  display: grid;
+  gap: 1rem;
+}
+
+.link-card {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.link-card:hover {
+  border-color: rgba(2, 132, 199, 0.35);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-2px);
+  color: inherit;
+}
+
+.link-card h3 {
+  margin: 0;
+  color: var(--color-petrol);
+}
+
+.link-card p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.link-card__cta {
+  color: var(--color-cyan);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.sticky-quote {
+  position: sticky;
+  top: calc(var(--header-h) + 1rem);
+}
+
+.section--muted {
+  background: #EEF2F6;
+}
+
+.error-page {
+  min-height: 55vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.error-page h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+@media (min-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2.5rem;
+  }
+
+  .link-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .link-cards--3 {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

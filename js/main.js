@@ -3,7 +3,7 @@
  * Cambia estos valores al arrendar la marca sin tocar el HTML/SEO estructural.
  */
 const SITE_CONFIG = {
-  brandName: "Clima Quillota",
+  brandName: "Climatización Quillota",
   email: "eduardorojas@outlook.cl",
   domain: "https://climatizacionquillota.cl/",
   city: "Quillota",
@@ -382,11 +382,30 @@ function setQuoteStatus(type, message) {
   status.className = `quote-form__status${type ? ` is-${type}` : ""}`;
 }
 
+/** Prefills servicio/sector from data-default-* on Rank & Rent landings. */
+function applyQuoteDefaults(form) {
+  const defaultService = form.dataset.defaultService;
+  const defaultSector = form.dataset.defaultSector;
+
+  if (defaultService && form.servicio) {
+    const option = Array.from(form.servicio.options).find(
+      (opt) => opt.value === defaultService
+    );
+    if (option) form.servicio.value = defaultService;
+  }
+
+  if (defaultSector && form.sector && !form.sector.value.trim()) {
+    form.sector.value = defaultSector;
+  }
+}
+
 /* ——— Formulario hero → lead por teléfono (FormSubmit) ——— */
 function initQuoteForm() {
   const form = document.getElementById("quote-form");
   const submitBtn = document.getElementById("quote-submit");
   if (!form) return;
+
+  applyQuoteDefaults(form);
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -402,6 +421,7 @@ function initQuoteForm() {
     if (honeypot) {
       setQuoteStatus("success", "Solicitud enviada. Te contactaremos por teléfono.");
       form.reset();
+      applyQuoteDefaults(form);
       return;
     }
 
@@ -433,6 +453,8 @@ function initQuoteForm() {
       document.getElementById("quote-detalle")?.value ||
       (snap ? snap.detalle : "Sin cálculo BTU");
 
+    const pageUrl = window.location.href;
+
     const payload = {
       nombre,
       telefono,
@@ -443,6 +465,7 @@ function initQuoteForm() {
       detalle_calculo: detalleValue,
       ciudad: SITE_CONFIG.city,
       origen: SITE_CONFIG.domain,
+      pagina: pageUrl,
       _subject: `Nueva cotización ${SITE_CONFIG.brandName} — ${servicio} — ${sector}`,
       _template: "table",
       _captcha: "false",
@@ -475,6 +498,7 @@ function initQuoteForm() {
       });
 
       form.reset();
+      applyQuoteDefaults(form);
       const btuInput = document.getElementById("quote-btu");
       const detalleInput = document.getElementById("quote-detalle");
       if (btuInput) btuInput.value = "";
@@ -515,7 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initBTUCalculator();
   initQuoteForm();
   initCTATracking();
-  trackEvent("page_view", { path: window.location.pathname });
+  /* page_view lo dispara gtag("config") — no duplicar aquí */
 
   if (document.readyState === "complete") {
     scheduleGA4();
